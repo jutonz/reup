@@ -1,13 +1,5 @@
 module Reup
   module Helpers
-    def rails?
-      @on_rails ||= File.exist? "Procfile"
-    end
-
-    def ember?
-      @on_ember ||= File.exist? "ember-cli-build.js"
-    end
-
     def run(command, quiet: false, print_command: true, replace_process: false)
       puts command if print_command
       command += " &>/dev/null" if quiet
@@ -40,8 +32,11 @@ module Reup
     end
 
     def env
-      return :rails if rails?
-      return :ember if ember?
+      @env ||= (
+        env = :rails if File.exist? "Procfile"
+        env = :ember if File.exist? "ember-cli-build.js"
+        env
+      )
     end
 
   end
