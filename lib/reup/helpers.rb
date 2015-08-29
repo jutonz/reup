@@ -30,8 +30,18 @@ module Reup
     end
 
     def serve
-      run("bundle exec foreman start", replace_process: true) if rails?
-      run("ember server", replace_process: true) if ember?
+      serve_command =
+        case env
+        when :rails then "bundle exec foreman start"
+        when :ember then "ember server"
+        end
+
+      run(serve_command, replace_process: true)
+    end
+
+    def env
+      return :rails if rails?
+      return :ember if ember?
     end
 
   end
