@@ -1,0 +1,31 @@
+#!/usr/bin/ruby
+
+require "slop"
+require "cocaine"
+require "byebug"
+
+require_relative "../lib/reup/version"
+require_relative "../lib/reup/helpers"
+
+include Reup::Helpers
+
+options = Slop.parse do |option|
+  option.bool   "-r", "--resetdb", "resets the database"
+  option.string "-b", "--branch",  "checkout branch"
+  option.on     "-v", "--version", "print the version" do
+    puts Reup::VERSION
+    exit
+  end
+end
+
+wasChange = detect_change_to(watch_files) do
+  run "git checkout #{options[:branch]}", quiet: true if options.branch?
+  run "git pull"
+end
+
+install if wasChange
+reset_db if options.resetdb?
+
+serve
+
+
