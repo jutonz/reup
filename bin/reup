@@ -2,7 +2,6 @@
 
 require "slop"
 require "cocaine"
-require "byebug"
 
 require_relative "../lib/reup/version"
 require_relative "../lib/reup/helpers"
