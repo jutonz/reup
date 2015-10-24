@@ -3,7 +3,8 @@ require "yaml"
 module Reup
   module Helpers
 
-    ENV_FILE = File.expand_path "../env.yaml", __FILE__
+    DEFAULT_ENV_FILE = File.expand_path "../.reup.yaml", __FILE__
+    USER_ENV_FILE    = File.expand_path ".reup.yaml", Dir.home
 
     ###########################################################################
     # Executable helpers
@@ -48,7 +49,13 @@ module Reup
     end
 
     def env_file
-      @env_file ||= YAML.load_file ENV_FILE
+      @env_file ||= (
+        if File.exist? USER_ENV_FILE
+          YAML.load_file USER_ENV_FILE
+        else
+          YAML.load_file DEFAULT_ENV_FILE
+        end
+      )
     end
 
     def watch_files

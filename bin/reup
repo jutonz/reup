@@ -1,21 +1,44 @@
 #!/usr/bin/ruby
 
+require_relative "../lib/reup"
 require "slop"
 require "cocaine"
 
-require_relative "../lib/reup/version"
-require_relative "../lib/reup/helpers"
-
-include Reup::Helpers
+include Reup
 
 options = Slop.parse do |option|
   option.bool   "-r", "--resetdb", "resets the database"
   option.string "-b", "--branch",  "checkout branch"
+  option.bool   "-f", "--force",   "force an action"
+  option.bool   "-i", "--init",    "initialize local settings file to #{USER_SETTINGS_PATH}"
+  option.bool   "-h", "--help",    "print this dialog"
   option.on     "-v", "--version", "print the version" do
     puts Reup::VERSION
     exit
   end
 end
+
+if options.help?
+  puts options
+  exit
+end
+
+if options.init?
+  puts "Initializing user settings file..."
+  if File.exist? USER_SETTINGS_PATH
+    if options.force?
+      puts "Overwriting existing settings file..."
+      FileUtils.rm USER_SETTINGS_PATH
+    else
+      puts "The file #{USER_SETTINGS_PATH} already exists. Use --force to override."
+      exit
+    end
+  end
+  initialize_user_settings
+  puts "Local settings file initialized to #{USER_SETTINGS_PATH}"
+  exit
+end
+
 
 wasChange = detect_change_to(watch_files) do
   run "git checkout #{options[:branch]}", quiet: true if options.branch?

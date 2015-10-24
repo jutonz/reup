@@ -21,4 +21,5 @@ rails:
       - Gemfile
   db:
     reset_command: "bundle exec rake db:migrate:reset"
+    migrate_command: "bundle exec rake db:migrate"
 
